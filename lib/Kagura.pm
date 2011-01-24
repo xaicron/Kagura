@@ -106,11 +106,18 @@ sub init_container {
 }
 
 sub load_plugin {
-
+    my ($class, $module, $conf) = @_;
+    $module = Plack::Util::load_class($module, __PACKAGE__.'::Plugin');
+    $module->init($conf);
 }
 
 sub load_plugins {
-
+    my ($class, @args)  = @_;
+    my $conf = $class->config->{plugin} || {};
+    for (my $i = 0; $i < @args; $i+=2) {
+        my ($module, $conf) = @args[$i,$i+1];
+        $class->load_plugin($module, $conf);
+    }
 }
 
 sub render {
