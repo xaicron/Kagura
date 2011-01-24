@@ -27,7 +27,7 @@ sub import {
         use strict 'refs';
         dispatch($class, @_);
     };
-    *{$class."::initialize"} = sub {
+    *{$class."::init"} = sub {
         use  strict 'refs';
         $pkg->init;
     };
@@ -158,7 +158,7 @@ sub to_app {
     my ($class) = shift;
 
     my $pkg = $class->_class;
-    $class->initialize;
+    $pkg->init;
 
     sub {
         my $env = shift;
