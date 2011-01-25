@@ -80,11 +80,17 @@ sub init_config {
 
 sub init_renderer {
     my ($class) = @_;
+
+    my $config    = $class->config->{template};
+    my $path      = $class->home_dir->subdir($config->{path} || 'tmpl');
+    my $cache_dir = $path->subdir($config->{cache_dir} || 'cache');
+
     my $renderer = Tiffany->load('Text::Xslate', {
-        syntax   => 'TTerse',
-        path     => $class->home_dir->subdir('tmpl')->stringify,
-        function => {},
-        module   => [qw/URI::Escape/],
+        syntax    => $config->{syntax} || 'TTerse',
+        path      => $path->stringify,
+        module    => [ 'Text::Xslate::Bridge::TT2Like', @{ $config->{module} || [] } ],
+        cache     => $config->{cache} || 1,
+        cache_dir => $cache_dir->stringify,
     });
     $class->renderer($renderer);
 }
