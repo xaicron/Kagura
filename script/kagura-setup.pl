@@ -27,17 +27,12 @@ my $name = shift || usage();
 (my $base_dir  = $name) =~ s{::}{-}g;
 (my $base_path = $name) =~ s{::}{/}g;
 
-mian: {
-    if (-e $base_dir) {
-        die "$base_dir is exists!\n";
-    }
-    else {
-        mkdir $base_dir or die "$base_dir: $!";
-        chdir $base_dir or die "$base_dir: $!";
-    }
+main: {
+    die "$base_dir is exists!\n" if -e $base_dir;
+    mkdir $base_dir or die "$base_dir: $!";
+    chdir $base_dir or die "$base_dir: $!";
 
     write_all();
-
     exit;
 }
 
