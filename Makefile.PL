@@ -20,6 +20,9 @@ test_requires 'Test::More', 0.96;
 tests join q{ }, map { sprintf 't%s.t', '/*' x $_ } 1..3;
 author_tests 'xt';
 
+install_script 'script/kagura-setup.pl';
+no_index directory => 'eg';
+
 auto_set_repository();
 
 WriteAll;
