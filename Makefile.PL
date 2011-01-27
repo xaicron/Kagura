@@ -10,10 +10,9 @@ requires 'Router::Simple::Sinatraish', 0.02;
 requires 'Class::Data::Inheritable', 0.08;
 requires 'Text::MicroTemplate', 0.18;
 requires 'Class::Accessor::Lite', 0.05;
+requires 'Object::Container', 0.14;
 
-recommends 'Object::Container', 0.14;
 recommends 'Text::Xslate', 1.0000;
-recommends 'Class::Method::Modifiers::Fast', 0.041;
 
 test_requires 'Test::More', 0.96;
 

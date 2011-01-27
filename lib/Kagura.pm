@@ -10,6 +10,7 @@ use Router::Simple::Sinatraish ();
 use Class::Data::Inheritable;
 use Path::Class qw/file dir/;
 use Plack::Util ();
+use Object::Container ();
 use Class::Accessor::Lite (
     new => 1,
     ro  => [qw/req/],
@@ -52,10 +53,12 @@ sub init {
     $class->mk_classdata('response_class');
     $class->mk_classdata('request_class');
     $class->mk_classdata('renderer');
+    $class->mk_classdata('container');
 
     $class->init_home_dir();
     $class->init_config();
     $class->init_renderer();
+    $class->init_container();
     $class->init_plugins();
     $class->response_class('Plack::Response');
     $class->request_class('Plack::Request');
@@ -91,6 +94,22 @@ sub init_renderer {
     });
 
     $class->renderer($renderer);
+}
+
+sub init_container {
+    my ($class) = @_;
+    $class->container('Object::Container');
+    return unless $class->config->{container};
+
+    my $container = $class->config->{container};
+    for my $name (keys %$container) {
+        $class->container->register({
+            class       => $name,
+            initializer => $container->{$name}{init},
+            args        => $container->{$name}{args},
+            preload     => $container->{$name}{preload},
+        });
+    }
 }
 
 sub init_plugins {

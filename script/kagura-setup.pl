@@ -19,7 +19,6 @@ GetOptions(
     'h|help!'             => sub { usage() },
     'r|renderer=s'        => \$renderer,
     's|template-suffix=s' => \my $suffix,
-    'use-container!'      => \my $use_container,
     'p|plugin=s@'         => \my @plugins,
 ) or usage();
 
@@ -64,7 +63,6 @@ sub _parse_data_section {
         base_dir       => $base_dir,
         base_path      => $base_path,
         renderer       => $renderer,
-        use_container  => $use_container,
         suffix         => $suffix || $suffix_map->{$renderer} || 'mt',
         plugins        => [@plugins],
     });
@@ -89,7 +87,6 @@ Options:
     h, help         show this message
     r, renderer     set rederer class (e.g. Text::Xslate. default Text::MicroTemplate)
     suffix          set template suffix (e.g. tt. default is renderer default suffix)
-    use-container   whether to use the container
     p, plugin       sets using plugin(s)
 
 USAGE
@@ -132,7 +129,6 @@ __DATA__
 ? my $base_dir       = $params->{base_dir};
 ? my $base_path      = $params->{base_path};
 ? my $renderer       = $params->{renderer};
-? my $use_container  = $params->{use_container};
 ? my $suffix         = $params->{suffix};
 ? my $plugins        = $params->{plugins};
 
@@ -190,33 +186,7 @@ sub init_renderer {
 }
 
 ? }
-? if ($use_container) {
-sub init_container {
-    my ($class) = @_;
-    $class->container('Object::Container');
-    return unless $class->config->{container};
 
-    my $container = $class->config->{container};
-    for my $name (keys %$container) {
-        $class->container->register({
-            class       => $name,
-            initializer => $container->{$name}{init},
-            args        => $container->{$name}{args},
-            preload     => $container->{$name}{preload},
-        });
-    }
-}
-
-use Class::Method::Modifiers::Fast;
-
-after init => sub {
-    my ($class) = @_;
-
-    $class->mk_classdata('container');
-    $class->init_container();
-};
-
-? }
 1;
 
 @@ lib/<?= $base_path ?>/Web/C/Root.pm
@@ -322,10 +292,6 @@ all_from 'lib/<?= $base_path ?>.pm';
 requires 'Kagura', '<?= $kagura_version ?>';
 ? if ($renderer eq 'Text::Xslate') {
 requires 'Text::Xslate', 1.0000;
-? }
-? if ($use_container) {
-requires 'Object::Cintaner', 0.14;
-requires 'Class::Method::Modifiers::Fast', 0.041;
 ? }
 
 test_requires 'Test::More', 0.96;
