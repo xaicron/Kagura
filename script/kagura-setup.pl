@@ -178,7 +178,7 @@ sub init_renderer {
     my $renderer = Tiffany->load('Text::Xslate', {
         syntax    => $config->{syntax} || 'TTerse',
         path      => $path->stringify,
-        module    => [ 'Text::Xslate::Bridge::TT2Like', @{ $config->{module} || [] } ],
+        module    => [ @{ $config->{module} || [] } ],
         cache     => $config->{cache} || 1,
         cache_dir => $cache_dir->stringify,
     });
