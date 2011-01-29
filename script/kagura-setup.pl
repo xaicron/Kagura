@@ -207,7 +207,7 @@ use strict;
 use warnings;
 
 sub index {
-    my ($c, $req, $route) = @_;
+    my ($c, $req) = @_;
     $c->render('index.<?= $suffix ?>');
 };
 
