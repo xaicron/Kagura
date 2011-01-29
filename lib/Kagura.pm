@@ -161,7 +161,7 @@ sub show_error {
     my ($self, $msg) = @_;
     return $self->response_class->new(500,
         ['Content-Type' => 'text/html; charset=utf-8'],
-        [$msg || ''],
+        [$msg || 'Internal Server Error'],
     );
 }
 
@@ -191,14 +191,15 @@ sub to_app {
         local *{"$pkg\::context"} = sub { $c };
         use strict 'refs';
 
-        if (my $route = $class->router->match($env)) {
-            my $code = delete $route->{code};
-            $c->params({ %$route });
-            my $res = $code->($c, $req);
+        if (my ($match, $route) = $class->router->routematch($env)) {
+            delete $match->{code} if ref $match->{code} eq 'CODE';
+            $c->params({ %$match });
+            my $res = $route->{dest}{code}->($c, $req);
+            $res = $c->show_error() unless ref $res;
             return $res->finalize;
         }
         else {
-            return [404, [], ['not found']];
+            return [404, [], ['Not Found']];
         }
     };
 }
