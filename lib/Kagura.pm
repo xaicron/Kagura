@@ -147,18 +147,18 @@ sub render {
 }
 
 sub return_404 {
-    return $_[0]->response_class->new(404, [], ['404 not found']);
+    return $_[0]->response_class->new(404, [], ['404 Not Found']);
 }
 
 sub return_403 {
-    return $_[0]->response_class->new(403, [], ['403 forbidden']);
+    return $_[0]->response_class->new(403, [], ['403 Forbidden']);
 }
 
 sub show_error {
     my ($self, $msg) = @_;
     return $self->response_class->new(500,
         ['Content-Type' => 'text/html; charset=utf-8'],
-        [$msg || 'Internal Server Error'],
+        [$msg || '500 Internal Server Error'],
     );
 }
 
@@ -201,7 +201,7 @@ sub to_app {
             return $res->finalize;
         }
         else {
-            return [404, [], ['Not Found']];
+            return $pkg->return_404();
         }
     };
 }
