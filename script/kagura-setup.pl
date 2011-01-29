@@ -20,6 +20,7 @@ GetOptions(
     'r|renderer=s'        => \$renderer,
     's|template-suffix=s' => \my $suffix,
     'p|plugin=s@'         => \my @plugins,
+    'json'                => \my $use_json,
 ) or usage();
 
 my $name = shift || usage();
@@ -65,6 +66,7 @@ sub _parse_data_section {
         renderer       => $renderer,
         suffix         => $suffix || $suffix_map->{$renderer} || 'mt',
         plugins        => [@plugins],
+        use_json       => $use_json,
     });
 
     my ($data, $path);
@@ -88,6 +90,7 @@ Options:
     r, renderer     set rederer class (e.g. Text::Xslate. default Text::MicroTemplate)
     suffix          set template suffix (e.g. tt. default is renderer default suffix)
     p, plugin       sets using plugin(s)
+    json            added render_json() method
 
 USAGE
     exit 1;
@@ -131,6 +134,7 @@ __DATA__
 ? my $renderer       = $params->{renderer};
 ? my $suffix         = $params->{suffix};
 ? my $plugins        = $params->{plugins};
+? my $use_json       = $params->{use_json};
 
 @@ <?= $base_dir ?>.psgi
 use lib 'lib';
@@ -157,6 +161,9 @@ use <?= $name ?>::Web;
 our $VERSION = '0.01';
 
 get '/' => dispatch(Root => 'index');
+? if ($use_json) {
+get '/json' => dispatch(Root => 'json');
+? }
 
 1;
 
@@ -166,6 +173,9 @@ package <?= $name ?>::Web;
 use strict;
 use warnings;
 use parent 'Kagura';
+? if ($use_json) {
+use JSON qw(encode_json);
+? }
 
 ? if ($renderer eq 'Text::Xslate') {
 sub init_renderer {
@@ -186,7 +196,17 @@ sub init_renderer {
 }
 
 ? }
+? if ($use_json) {
+sub render_json {
+    my ($self, $data) = @_;
+    my $content = encode_json($data);
+    $self->response_class->new(200, [
+        'Content-Length' => length($content),
+        'Content-Type'   => 'application/json; charset=utf-8',
+    ], [$content]);
+}
 
+? }
 1;
 
 @@ lib/<?= $base_path ?>/Web/C/Root.pm
@@ -200,6 +220,13 @@ sub index {
     $c->render('index.<?= $suffix ?>');
 };
 
+? if ($use_json) {
+sub json {
+    my ($c, $req, $route) = @_;
+    $c->render_json(+{ foo => 'bar' });
+}
+
+? }
 1;
 
 @@ lib/<?= $base_path ?>/M.pm
