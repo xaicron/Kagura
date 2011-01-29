@@ -1,0 +1,297 @@
+# NAME
+
+Kagura - simple web application framework
+
+# SYNOPSIS
+
+Generating new project:
+
+  $ kagura-setup.pl MyApp
+
+run app.psgi
+
+  $ cd MyApp
+  $ plackup MyApp.psgi
+
+# DESCRIPTION
+
+Kagura is easy, simple, lightweight web application framework.
+
+# EXPORT FUNCTIONS
+
+- __get($path, $code)__
+
+- __post($path, $code)__
+
+- __any([$method, ] $path, $code)__
+
+This founctions from [Router::Simple::Sinatraish](http://search.cpan.org/perldoc?Router::Simple::Sinatraish).
+
+`$code` must be returned Plack::Response-like object.
+
+  pacakge MyApp;
+  use MyApp::Web;
+  
+
+  get '/' => sub {
+      my ($c, $req) = @_;
+      ...
+      my $res = $c->response_class->new(200, [], ['Hello Kagura!!']);
+      return $res;
+  }
+  post '/' => sub {
+      my ($c, $req) = @_;
+      ...
+      return $res;
+  }
+  any '/' => sub {
+      my ($c, $req) = @_;
+      ...
+      return $res;
+  }
+  any [qw/GET DELETE/], '/any' => sub {
+      my ($c, $req) = @_;
+      ...
+  }
+  
+
+  # $c   is Kagura-like object
+  # $req is Plack::Requst-like object (eq $c->req)
+  # $res is Plack::Response-like object
+
+- __dispatch($contoroller, $method_name)__
+
+Sets dispatch rule.
+
+into MyApp.pm
+
+  pacakge MyApp;
+  use MyApp::Web;
+  
+
+  # call MyApp::Web::C::Root::index
+  get '/' => dispatch('Root', 'index');
+
+into MyApp/Web/C/Root.pm
+
+  package MyApp::Web::C::Root;
+  
+
+  sub index {
+      my ($c, $req) = @_;
+      ...
+  }
+
+# METHOD
+
+- __req()__
+
+Get request object.
+
+  get '/' => sub {
+     my ($c, $req) = @_;
+     $c->req; # eq $req
+     ...
+  }
+
+- __params()__
+
+Route parameters.
+
+  get '/{user}' => sub {
+     my ($c, $req) = @_;
+     my $params = $c->params;
+     ...
+  }
+  
+
+  # GET http://localhost/foo
+  # $params->{user} eq 'foo'
+
+- __render(@args)__
+
+Rendering template. Returned `response_class` object.
+
+  get '/' => sub {
+     my ($c, $req) = @_;
+     ...
+     my $res = $c->render('index.mt');
+     return $res;
+  }
+
+- __model($name)__
+
+Get `MyApp::M::$name` object.
+
+  pacakge MyApp::M::User;
+  sub find {
+      my ($self, $user_id) = @_;
+      ...
+      return $user_name;
+  }
+  
+
+  package MyApp;
+  use parent 'MyApp::Web';
+  get '/{user_id}' => sub {
+      my ($c, $req) = @_;
+      my $user_name = $c->model('User')->find($c->params->{user_id});
+      ...
+  }
+
+- __return_404()__
+
+Returned status 404.
+
+  get '/404' => sub {
+     my ($c, $req) = @_;
+     return $c->return_404();
+  }
+
+- __return_403()__
+
+Returned status 403.
+
+  get '/403' => sub {
+     my ($c, $req) = @_;
+     return $c->return_403();
+  }
+
+- __show_error()__
+
+Returned status 500.
+
+  get '/error' => sub {
+     my ($c, $req) = @_;
+     return $c->show_error('oops!!');
+  }
+
+- __stash([$hashref])__
+
+You can use freely.
+
+# CLASS METHOD
+
+- __to_app()__
+
+into app.psgi
+
+  use MyApp;
+  MyApp->to_app;
+
+- __init()__
+
+Init application. This method in to_app() called.
+
+- __init_prepare()__
+
+Call prepare init() method. This method is in inii() called.
+
+You can overwridet this method.
+
+  pacakge MyApp::Web;
+  use parent 'Kagura';
+  
+
+  sub init_prepare {
+      my ($class) = @_;
+      ...
+  }
+
+- __init_finalize()__
+
+Call finalize init() method. This method is in inii() called.
+
+You can overwridet this method.
+
+  pacakge MyApp::Web;
+  use parent 'Kagura';
+  
+
+  sub init_finalize {
+      my ($class) = @_;
+      ...
+  }
+
+- __load_plugin($class [, $config])__
+
+Load plugin class. this method must be calling in init_finalzie() or after init().
+
+  package MyApp::Web;
+  use parent 'Kagura'
+  
+
+  sub init_finalize {
+      my ($class) = @_;
+      $class->load_plugin('Web::JSON');
+      $class->load_plugin('+MyApp::Plugin::Foo', +{ bar => 'baz' });
+  }
+
+- __load_plugins(%args)__
+
+Load plugins.
+
+  package MyApp::Web;
+  use parent 'Kagura';
+  
+
+  sub init_finalize {
+      my ($class) = @_;
+      $class->load_plugins(
+        'Web::JSON'           => {},
+        '+MyApp::Plugin::Foo' => +{ bar => 'baz' }
+      );
+  }
+
+or configuration:
+
+  # conf/developlemt.pl
+  +{
+      plugin => +{
+          'Web::JSON'           => +{},
+          '+MyApp::Plugin::Foo' => +{ bar => 'baz' },
+      },
+  }
+
+# DEFAULT CLASS ACCESSOR METHOD
+
+These methods you can calling the after init().
+
+- __config([$hash_ref])__
+
+Loaded configuration from `conf/$ENV{PLACK_ENV}.pl`
+
+- __home_dir([$home_dir])__
+
+Sets value must be [Path::Class](http://search.cpan.org/perldoc?Path::Class)-like object.
+
+- __renderer([$renderer])__
+
+Sets value must be [Tiffany](http://search.cpan.org/perldoc?Tiffany)::* object.
+
+- __container([$scalar]__
+
+Default 'Object::Container'
+
+- __request_class([$scalar])__
+
+Default 'Plack::Request'
+
+- __response_class([$scalar])__
+
+Default 'Plack::Response'
+
+# AUTHOR
+
+xaicron <xaicron {at} cpan.org>
+
+# COPYRIGHT
+
+Copyright 2011 - xaicron
+
+# LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+# SEE ALSO

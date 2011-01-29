@@ -1,6 +1,9 @@
 use inc::Module::Install;
+use Module::Install::ReadmeMarkdownFromPod;
+
 name 'Kagura';
 all_from 'lib/Kagura.pm';
+readme_markdown_from 'lib/Kagura.pm';
 
 requires 'Path::Class', 0.23;
 requires 'Plack', 0.99;
