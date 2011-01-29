@@ -52,18 +52,16 @@ sub init {
 
     $class->mk_classdata('config');
     $class->mk_classdata('home_dir');
-    $class->mk_classdata('response_class');
-    $class->mk_classdata('request_class');
     $class->mk_classdata('renderer');
-    $class->mk_classdata('container');
+    $class->mk_classdata('container', 'Object::Container');
+    $class->mk_classdata('response_class', 'Plack::Response');
+    $class->mk_classdata('request_class', 'Plack::Request');
 
     $class->init_home_dir();
     $class->init_config();
     $class->init_renderer();
     $class->init_container();
     $class->init_plugins();
-    $class->response_class('Plack::Response');
-    $class->request_class('Plack::Request');
 
     $class->init_prepare();
 }
@@ -106,7 +104,6 @@ sub init_renderer {
 
 sub init_container {
     my ($class) = @_;
-    $class->container('Object::Container');
     return unless $class->config->{container};
 
     my $container = $class->config->{container};
