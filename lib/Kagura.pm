@@ -48,6 +48,8 @@ sub mk_classdata {
 sub init {
     my ($class) = @_;
 
+    $class->init_prepare();
+
     $class->mk_classdata('config');
     $class->mk_classdata('home_dir');
     $class->mk_classdata('response_class');
@@ -62,7 +64,13 @@ sub init {
     $class->init_plugins();
     $class->response_class('Plack::Response');
     $class->request_class('Plack::Request');
+
+    $class->init_prepare();
 }
+
+# you can overwride this method
+sub init_prepare  {}
+sub init_finalize {}
 
 sub init_home_dir {
     my ($class) = @_;
