@@ -214,7 +214,7 @@ inside MyApp.pm
   use Kagura;
    
   get '/' => sub {
-      my ($c, $req, $route) = @_l
+      my ($c, $req, $route) = @_;
       $c->render('index.xt');
   };
    
