@@ -13,8 +13,8 @@ use Plack::Util ();
 use Object::Container ();
 use Class::Accessor::Lite (
     new => 1,
-    ro  => [qw/req/],
-    rw  => [qw/params stash/],
+    ro  => [qw/req params/],
+    rw  => [qw/stash/],
 );
 
 our $VERSION = '0.01';
@@ -182,15 +182,20 @@ sub to_app {
 
     sub {
         my $env = shift;
-        my $req = $pkg->request_class->new($env);
-        my $c   = $pkg->new(req => $req, class => $class, stash => {});
-        no strict 'refs';
-        local *{"$pkg\::context"} = sub { $c };
-        use strict 'refs';
-
         if (my ($match, $route) = $class->router->routematch($env)) {
             delete $match->{code} if ref $match->{code} eq 'CODE';
-            $c->params({ %$match });
+
+            my $req = $pkg->request_class->new($env);
+            my $c = $pkg->new(
+                req    => $req,
+                class  => $class,
+                stash  => {},
+                params => +{ %$match },
+            );
+            no strict 'refs';
+            local *{"$pkg\::context"} = sub { $c };
+            use strict 'refs';
+
             my $res = $route->{dest}{code}->($c, $req);
             $res = $c->show_error() unless ref $res;
             return $res->finalize;
