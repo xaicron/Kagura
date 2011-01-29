@@ -122,14 +122,14 @@ sub init_container {
 
 sub init_plugins {
     my ($class) = @_;
-    my $config = $class->config->{plugins} || [];
-    $class->load_plugins(@$config);
+    my $config = $class->config->{plugin} || {};
+    $class->load_plugins(%$config);
 }
 
 sub load_plugins {
-    my ($class, @args)  = @_;
-    for (my $i = 0; $i < @args; $i+=2) {
-        my ($module, $conf) = @args[$i,$i+1];
+    my ($class, %args)  = @_;
+    for my $module (keys %args) {
+        my $conf = $args{$module};
         $class->load_plugin($module, $conf);
     }
 }
@@ -137,7 +137,7 @@ sub load_plugins {
 sub load_plugin {
     my ($class, $module, $conf) = @_;
     $module = Plack::Util::load_class($module, __PACKAGE__.'::Plugin');
-    $module->init($conf);
+    $module->init($class, $conf);
 }
 
 sub render {
@@ -166,7 +166,7 @@ sub show_error {
 }
 
 sub model {
-    my ($self, $model, @args) = @_;
+    my ($self, $model) = @_;
     my $model_class = "$self->{class}::M::$model";
     $self->container->get($model_class);
 }
