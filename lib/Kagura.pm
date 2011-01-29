@@ -233,7 +233,7 @@ run app.psgi
 
 =head1 DESCRIPTION
 
-Kagura is
+Kagura is easy, simple, lightweightl web application framework.
 
 =head1 AUTHOR
 
