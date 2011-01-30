@@ -66,7 +66,7 @@ sub init {
     $class->init_prepare();
 }
 
-# you can overwride this method
+# you can override this method
 sub init_prepare  {}
 sub init_finalize {}
 
@@ -242,7 +242,7 @@ Kagura is easy, simple, lightweight web application framework.
 
 =item B<< any([$method, ] $path, $code) >>
 
-This founctions from L<< Router::Simple::Sinatraish >>.
+This functions from L<< Router::Simple::Sinatraish >>.
 
 C<< $code >> must be returned Plack::Response-like object.
 
@@ -400,13 +400,13 @@ into app.psgi
 
 =item B<< init() >>
 
-Init application. This method in to_app() called.
+Initialize application. This method in to_app() called.
 
 =item B<< init_prepare() >>
 
 Call prepare init() method. This method is in inii() called.
 
-You can overwridet this method.
+You can override this method.
 
   pacakge MyApp::Web;
   use parent 'Kagura';
@@ -420,7 +420,7 @@ You can overwridet this method.
 
 Call finalize init() method. This method is in inii() called.
 
-You can overwridet this method.
+You can override this method.
 
   pacakge MyApp::Web;
   use parent 'Kagura';

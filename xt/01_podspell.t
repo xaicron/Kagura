@@ -35,6 +35,7 @@ MyApp
 pm
 psgi
 app
+plugins
 
 # personal section
 xaicron
