@@ -56,6 +56,7 @@ sub init {
     $class->mk_classdata('container', 'Object::Container');
     $class->mk_classdata('response_class', 'Plack::Response');
     $class->mk_classdata('request_class', 'Plack::Request');
+    $class->mk_classdata('_loaded_plugin', +{});
 
     $class->init_home_dir();
     $class->init_config();
@@ -134,7 +135,9 @@ sub load_plugins {
 sub load_plugin {
     my ($class, $module, $conf) = @_;
     $module = Plack::Util::load_class($module, __PACKAGE__.'::Plugin');
+    return if $class->_loaded_plugin->{$module};
     $module->init($class, $conf);
+    $class->_loaded_plugin->{$module}++;
 }
 
 sub render {
