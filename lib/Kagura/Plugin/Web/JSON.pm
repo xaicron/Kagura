@@ -3,13 +3,14 @@ package Kagura::Plugin::Web::JSON;
 use strict;
 use warnings;
 use Kagura::Util;
-use JSON qw(encode_json);
+use JSON ();
 
 sub init {
     my ($class, $c, $conf) = @_;
+    my $json = JSON->new->utf8(1);
     Kagura::Util::add_method($c, render_json => sub {
         my ($self, $data) = @_;
-        my $content = encode_json($data);
+        my $content = $json->encode($data);
         $self->response_class->new(200, [
             'Content-Length' => length($content),
             'Content-Type'   => 'application/json; charset=utf-8',
