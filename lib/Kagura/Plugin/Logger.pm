@@ -6,7 +6,7 @@ use Kagura::Util;
 
 sub init {
     my ($class, $c, $conf) = @_;
-    $conf ||= $c->config->{logger} || {};
+    $conf ||= $c->config->{plugin}{Logger} || {};
 
     my $logger_class = $conf->{class} || 'Log::Dispatch';
     my $args         = $conf->{args}  || [];
