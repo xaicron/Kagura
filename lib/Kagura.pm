@@ -63,7 +63,7 @@ sub init {
     $class->init_container();
     $class->init_plugins();
 
-    $class->init_prepare();
+    $class->init_finalize();
 }
 
 # you can override this method
