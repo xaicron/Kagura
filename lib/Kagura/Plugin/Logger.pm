@@ -39,7 +39,7 @@ BEGIN {
             my ($module, $file, $line);
             my $i = 0;
             while (($module, $file, $line) = caller($i++)) {
-                last if $module !~ m{^(?:Kagura::Plugin::Log::Dispatch|Log::Dispatch)};
+                last if $module !~ m{^(?:Kagura::Log|Log::Dispatch)};
             }
             $self->log(
                 level   => $level,
