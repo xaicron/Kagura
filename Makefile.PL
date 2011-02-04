@@ -1,9 +1,7 @@
 use inc::Module::Install;
-use Module::Install::ReadmePodFromPod;
 
 name 'Kagura';
 all_from 'lib/Kagura.pm';
-readme_pod_from  'lib/Kagura.pm';
 
 requires 'Path::Class', 0.23;
 requires 'Plack', 0.99;
