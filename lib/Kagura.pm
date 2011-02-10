@@ -185,7 +185,9 @@ sub to_app {
 
     sub {
         my $env = shift;
-        if (my ($match, $route) = $class->router->routematch($env)) {
+        my $res;
+        my ($match, $route) = $class->router->routematch($env);
+        if ($match && $route) {
             delete $match->{code} if ref $match->{code} eq 'CODE';
 
             my $req = $pkg->request_class->new($env);
@@ -199,13 +201,14 @@ sub to_app {
             local *{"$pkg\::context"} = sub { $c };
             use strict 'refs';
 
-            my $res = $route->{dest}{code}->($c, $req);
+            $res = $route->{dest}{code}->($c, $req);
             $res = $c->show_error() unless ref $res;
-            return $res->finalize;
         }
         else {
-            return $pkg->return_404();
+            $res = $pkg->return_404();
         }
+
+        $res->finalize;
     };
 }
 
