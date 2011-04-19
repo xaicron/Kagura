@@ -109,11 +109,13 @@ Kagura::Plugin::Logger - sets logger
           class => 'MyLogger', # default Kagura::Plugin::Log::Dispatch
           args  => [
               outputs => [
-                  'Screen' => (
-                      min_level => 'debug',
-                      stderr    => 1,
-                      newline   => 1,
-                  ),
+                  [
+                      Screen => (
+                          min_level => 'debug',
+                          stderr    => 1,
+                          newline   => 1,
+                      ),
+                  ],
               ],
           ],
       },
