@@ -494,7 +494,7 @@ Sets value must be L<< Path::Class >>-like object.
 
 Sets value must be L<< Tiffany >>::* object.
 
-=item B<< container([$scalar] >>
+=item B<< container([$scalar]) >>
 
 Default 'Object::Container'
 
