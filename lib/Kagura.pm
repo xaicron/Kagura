@@ -111,7 +111,7 @@ sub init_container {
     for my $name (keys %$container) {
         $class->container->register({
             class       => $name,
-            initializer => $container->{$name}{init},
+            initializer => $container->{$name}{initializer},
             args        => $container->{$name}{args},
             preload     => $container->{$name}{preload},
         });
