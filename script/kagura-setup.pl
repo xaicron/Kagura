@@ -88,7 +88,6 @@ Options:
     r, renderer     set rederer class (e.g. Text::Xslate. default Text::MicroTemplate)
     suffix          set template suffix (e.g. tt. default is renderer default suffix)
     p, plugin       sets using plugin(s)
-    json            added render_json() method
 
 USAGE
     exit 1;
