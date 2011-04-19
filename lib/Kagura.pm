@@ -252,7 +252,7 @@ This functions from L<< Router::Simple::Sinatraish >>.
 
 C<< $code >> must be returned Plack::Response-like object.
 
-  pacakge MyApp;
+  package MyApp;
   use MyApp::Web;
   
   get '/' => sub {
@@ -260,21 +260,21 @@ C<< $code >> must be returned Plack::Response-like object.
       ...
       my $res = $c->response_class->new(200, [], ['Hello Kagura!!']);
       return $res;
-  }
+  };
   post '/' => sub {
       my ($c, $req) = @_;
       ...
       return $res;
-  }
+  };
   any '/' => sub {
       my ($c, $req) = @_;
       ...
       return $res;
-  }
+  };
   any [qw/GET DELETE/], '/any' => sub {
       my ($c, $req) = @_;
       ...
-  }
+  };
   
   # $c   is Kagura-like object
   # $req is Plack::Requst-like object (eq $c->req)
@@ -286,7 +286,7 @@ Sets dispatch rule.
 
 into MyApp.pm
 
-  pacakge MyApp;
+  package MyApp;
   use MyApp::Web;
   
   # call MyApp::Web::C::Root::index
@@ -315,7 +315,7 @@ Get request object.
      my ($c, $req) = @_;
      $c->req; # eq $req
      ...
-  }
+  };
 
 =item B<< params() >>
 
@@ -325,7 +325,7 @@ Route parameters.
      my ($c, $req) = @_;
      my $params = $c->params;
      ...
-  }
+  };
   
   # GET http://localhost/foo
   # $params->{user} eq 'foo'
@@ -339,13 +339,13 @@ Rendering template. Returned C<< response_class >> object.
      ...
      my $res = $c->render('index.mt');
      return $res;
-  }
+  };
 
 =item B<< model($name) >>
 
 Get C<< MyApp::M::$name >> object.
 
-  pacakge MyApp::M::User;
+  package MyApp::M::User;
   sub find {
       my ($self, $user_id) = @_;
       ...
@@ -358,7 +358,7 @@ Get C<< MyApp::M::$name >> object.
       my ($c, $req) = @_;
       my $user_name = $c->model('User')->find($c->params->{user_id});
       ...
-  }
+  };
 
 =item B<< return_404() >>
 
@@ -367,7 +367,7 @@ Returned status 404.
   get '/404' => sub {
      my ($c, $req) = @_;
      return $c->return_404();
-  }
+  };
 
 =item B<< return_403() >>
 
@@ -376,7 +376,7 @@ Returned status 403.
   get '/403' => sub {
      my ($c, $req) = @_;
      return $c->return_403();
-  }
+  };
 
 =item B<< show_error() >>
 
@@ -385,7 +385,7 @@ Returned status 500.
   get '/error' => sub {
      my ($c, $req) = @_;
      return $c->show_error('oops!!');
-  }
+  };
 
 =item B<< stash([$hashref]) >>
 
@@ -414,7 +414,7 @@ Call prepare init() method. This method is in inii() called.
 
 You can override this method.
 
-  pacakge MyApp::Web;
+  package MyApp::Web;
   use parent 'Kagura';
   
   sub init_prepare {
@@ -428,7 +428,7 @@ Call finalize init() method. This method is in inii() called.
 
 You can override this method.
 
-  pacakge MyApp::Web;
+  package MyApp::Web;
   use parent 'Kagura';
   
   sub init_finalize {
