@@ -132,7 +132,7 @@ __DATA__
 ? my $suffix         = $params->{suffix};
 ? my $plugins        = $params->{plugins};
 
-@@ <?= $base_dir ?>.psgi
+@@ app.psgi
 use lib 'lib';
 use <?= $name ?>;
 use Plack::Builder;
