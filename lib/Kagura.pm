@@ -53,7 +53,7 @@ sub init {
     $class->mk_classdata('config');
     $class->mk_classdata('home_dir');
     $class->mk_classdata('renderer');
-    $class->mk_classdata('container', 'Object::Container');
+    $class->mk_classdata('container', Object::Container->instance);
     $class->mk_classdata('response_class', 'Plack::Response');
     $class->mk_classdata('request_class', 'Plack::Request');
     $class->mk_classdata('_loaded_plugin', +{});
@@ -167,8 +167,12 @@ sub show_error {
 
 sub model {
     my ($self, $model) = @_;
-    my $model_class = "$self->{class}::M::$model";
-    $self->container->get($model_class);
+    my $class = Plack::Util::load_class($model, "$self->{class}::M");
+    my $container = $self->container;
+    unless ($container->registered_classes->{$class}) {
+        $container->register($class);
+    }
+    $container->get($class);
 }
 
 sub dispatch {
