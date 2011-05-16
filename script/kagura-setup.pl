@@ -8,6 +8,8 @@ use File::Path qw/mkpath/;
 use File::Basename qw/dirname/;
 use File::Spec;
 use Kagura ();
+use Plack::Util;
+use ExtUtils::MakeMaker qw/prompt/;
 
 my $renderer = 'Text::MictoTemplate::File';
 my $suffix_map = +{
@@ -28,14 +30,28 @@ my $name = shift || usage();
 
 main: {
     die "$base_dir is exists!\n" if -e $base_dir;
-    mkdir $base_dir or die "$base_dir: $!";
-    chdir $base_dir or die "$base_dir: $!";
 
+    check_has_plugins();
     write_all();
+
     exit;
 }
 
+sub check_has_plugins {
+    local $@;
+    for my $plugin (@plugins) {
+        eval { Plack::Util::load_class($plugin, 'Kagura::Plugin') };
+        if ($@ && lc(prompt "$plugin is not installed. Are you sure to process?", 'n') eq 'n') {
+            print "regected\n";
+            exit;
+        }
+    }
+}
+
 sub write_all {
+    mkdir $base_dir or die "$base_dir: $!";
+    chdir $base_dir or die "$base_dir: $!";
+
     my $data = _parse_data_section();
 
     print "Generating for $name\n";
@@ -87,7 +103,7 @@ Options:
     h, help         show this message
     r, renderer     set rederer class (e.g. Text::Xslate. default Text::MicroTemplate)
     suffix          set template suffix (e.g. tt. default is renderer default suffix)
-    p, plugin       sets using plugin(s)
+    p, plugin       sets using plugins (e.g. Logger / Web::JSON / +Your::Plugin)
 
 USAGE
     exit 1;
