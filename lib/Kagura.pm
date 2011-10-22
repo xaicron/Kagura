@@ -10,7 +10,7 @@ use Router::Simple::Sinatraish ();
 use Class::Data::Inheritable;
 use Path::Class qw/file dir/;
 use Plack::Util ();
-use Object::Container ();
+use Kagura::Container ();
 use Class::Accessor::Lite (
     new => 1,
     ro  => [qw/req params/],
@@ -53,7 +53,7 @@ sub init {
     $class->mk_classdata('config');
     $class->mk_classdata('home_dir');
     $class->mk_classdata('renderer');
-    $class->mk_classdata('container', Object::Container->instance);
+    $class->mk_classdata('container', Kagura::Container->instance);
     $class->mk_classdata('response_class', 'Plack::Response');
     $class->mk_classdata('request_class', 'Plack::Request');
     $class->mk_classdata('_loaded_plugin', +{});
