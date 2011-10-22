@@ -4,6 +4,7 @@
 \.git/
 ^MANIFEST\.
 ^Makefile$
+^MYMETA\.
 ~$
 \.old$
 ^blib/
