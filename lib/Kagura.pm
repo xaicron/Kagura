@@ -9,13 +9,13 @@ use Encode ();
 use Router::Simple::Sinatraish ();
 use Class::Data::Inheritable;
 use Path::Class qw/file dir/;
-use Plack::Util ();
-use Kagura::Container ();
 use Class::Accessor::Lite (
     new => 1,
     ro  => [qw/req params/],
     rw  => [qw/stash/],
 );
+
+use Kagura::Util qw(load_class);
 
 our $VERSION = '0.01';
 
@@ -135,7 +135,7 @@ sub load_plugins {
 
 sub load_plugin {
     my ($class, $module, $conf) = @_;
-    $module = Plack::Util::load_class($module, __PACKAGE__.'::Plugin');
+    $module = load_class($module, __PACKAGE__.'::Plugin');
     return if $class->_loaded_plugin->{$module};
     $module->init($class, $conf);
     $class->_loaded_plugin->{$module}++;
@@ -168,7 +168,7 @@ sub show_error {
 
 sub model {
     my ($self, $model) = @_;
-    my $class = Plack::Util::load_class($model, "$self->{class}::M");
+    my $class = load_class($model, "$self->{class}::M");
     my $container = $self->container;
     unless ($container->registered_classes->{$class}) {
         $container->register($class);
@@ -178,7 +178,7 @@ sub model {
 
 sub dispatch {
     my ($class, $klass, $route, $method) = @_;
-    my $module = Plack::Util::load_class($route, "$klass\::Web::C");
+    my $module = load_class($route, "$klass\::Web::C");
     return \&{"$module\::$method"};
 }
 
