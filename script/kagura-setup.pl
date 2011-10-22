@@ -176,6 +176,15 @@ get '/' => dispatch(Root => 'index');
 
 1;
 
+@@ lib/<?= $base_path ?>/Container.pm
+package <?= $name ?>::Container;
+
+use strict;
+use warnings;
+use parent 'Kagura::Container';
+
+1;
+
 @@ lib/<?= $base_path ?>/Web.pm
 package <?= $name ?>::Web;
 

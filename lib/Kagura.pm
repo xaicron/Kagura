@@ -54,7 +54,7 @@ sub init {
     $class->mk_classdata('config');
     $class->mk_classdata('home_dir');
     $class->mk_classdata('renderer');
-    $class->mk_classdata('container', Kagura::Container->instance);
+    $class->mk_classdata('container', load_container($class));
     $class->mk_classdata('response_class', 'Plack::Response');
     $class->mk_classdata('request_class', 'Plack::Request');
     $class->mk_classdata('_loaded_plugin', +{});
@@ -71,6 +71,12 @@ sub init {
 # you can override this method
 sub init_prepare  {}
 sub init_finalize {}
+
+sub load_container {
+    my $class = shift;
+    $class =~ s/::Web$//;
+    load_class("$class\::Container")->instance;
+}
 
 sub init_home_dir {
     my ($class) = @_;
