@@ -26,16 +26,11 @@ sub import {
     Router::Simple::Sinatraish->export_to_level(1);
 
     no strict 'refs';
-    *{$class."::to_app"} = \&to_app;
-    *{$class."::_class"} = sub { $pkg };
-    *{$class."::dispatch"} = sub {
-        use strict 'refs';
-        dispatch($class, @_);
-    };
-    *{$class."::init"} = sub {
-        use  strict 'refs';
-        $pkg->init;
-    };
+    *{$class."::to_app"}    = \&to_app;
+    *{$class."::_class"}    = sub { $pkg };
+    *{$class."::init"}      = sub { $pkg->init };
+    *{$class."::bootstrap"} = sub { $pkg->bootstrap(class => $class, @_) };
+    *{$class."::dispatch"}  = sub { $pkg->dispatch($class, @_) };
 }
 
 sub contenxt { die "no context is awaked" }
@@ -43,6 +38,12 @@ sub contenxt { die "no context is awaked" }
 sub mk_classdata {
     my $class = shift;
     Class::Data::Inheritable::mk_classdata($class, @_);
+}
+
+sub bootstrap {
+    my $class = shift;
+    $class->init;
+    return $class->new(@_);
 }
 
 sub init {
@@ -79,9 +80,9 @@ sub init_home_dir {
 
 sub init_config {
     my ($class) = @_;
-    my $env    = $ENV{PLACK_ENV} || 'development';
-    my $fname  = $class->home_dir->file('conf', "$env.pl")->stringify;
-    my $config = do $fname or die "cannot load configuration file: $fname";
+    my $env  = $ENV{KAGURA_ENV} || $ENV{PLACK_ENV} || 'development';
+    my $file = $class->home_dir->file('conf', "$env.pl")->stringify;
+    my $config = do $file or die "cannot load configuration file: $file";
     $class->config($config);
 }
 
@@ -176,8 +177,8 @@ sub model {
 }
 
 sub dispatch {
-    my ($class, $route, $method) = @_;
-    my $module = Plack::Util::load_class($route, "$class\::Web::C");
+    my ($class, $klass, $route, $method) = @_;
+    my $module = Plack::Util::load_class($route, "$klass\::Web::C");
     return \&{"$module\::$method"};
 }
 
