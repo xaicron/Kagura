@@ -27,31 +27,48 @@ package
     Kagura::Log;
 
 use parent 'Log::Dispatch';
-use Data::Dump ();
+use Data::Dumper ();
 use POSIX qw(strftime);
+
+my $PREPARE_MESSAGE = {
+    d => sub {
+        local $Data::Dumper::Terse  = 1;
+        local $Data::Dumper::Indent = 0;
+        local $Data::Dumper::Useqq  = 1;
+        local $Data::Dumper::Pair   = '=>';
+        join ',', Data::Dumper::Dumper(@_);
+    },
+    f => sub {
+        my ($format, @args) = @_;
+        sprintf $format, @args;
+    },
+};
 
 BEGIN {
     for my $level (qw{
         debug info notice warn warning err error crit critical alert emerg
     }) {
-       my $sub = sub {
-            my $self = shift;
-            my ($module, $file, $line);
-            my $i = 0;
-            while (($module, $file, $line) = caller($i++)) {
-                last if $module !~ m{^(?:Kagura::Log|Log::Dispatch)};
-            }
-            $self->log(
-                level   => $level,
-                message => "@_",
-                module  => $module,
-                file    => $file,
-                line    => $line,
-            );
-       };
+        for my $suffix ('', 'd', 'f') {
+            my $method = $level.$suffix;
+            my $sub = sub {
+                my $self = shift;
+                my ($module, $file, $line);
+                my $i = 0;
+                while (($module, $file, $line) = caller($i++)) {
+                    last if $module !~ m{^(?:Kagura::Log|Log::Dispatch)};
+                }
+                $self->log(
+                    level   => $level,
+                    message => $suffix ? $PREPARE_MESSAGE->{$suffix}->(@_) : "@_",
+                    module  => $module,
+                    file    => $file,
+                    line    => $line,
+                );
+            };
 
-       no strict 'refs';
-       *{$level} = $sub;
+            no strict 'refs';
+            *{$method} = $sub;
+        }
     }
 }
 
@@ -63,11 +80,6 @@ sub new {
         ];
     }
     $class->SUPER::new(%args);
-}
-
-sub dump {
-    my ($self, @data) = @_;
-    $self->debug(Data::Dump::dump(@data));
 }
 
 sub _log_to {
