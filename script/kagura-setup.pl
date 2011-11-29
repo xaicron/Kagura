@@ -14,7 +14,7 @@ use ExtUtils::MakeMaker qw/prompt/;
 my $renderer = 'Text::MictoTemplate::File';
 my $suffix_map = +{
     'Text::MictoTemplate::File' => 'mt',
-    'Text::Xslate'              => 'xt',
+    'Text::Xslate'              => 'tx',
 };
 
 GetOptions(
@@ -245,7 +245,7 @@ use warnings;
 
 1;
 
-@@ t/00_complie.t
+@@ t/00_compile.t
 use strict;
 use warnings;
 use Test::More tests => 1;
@@ -375,6 +375,7 @@ git.push_to = origin
 @@ .gitignore
 cover_db
 META.yml
+MYMETA.*
 Makefile
 blib
 inc
