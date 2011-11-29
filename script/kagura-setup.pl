@@ -4,12 +4,12 @@ use strict;
 use warnings;
 use Text::MicroTemplate qw(render_mt);
 use Getopt::Long qw(GetOptions);
-use File::Path qw/mkpath/;
-use File::Basename qw/dirname/;
+use File::Path qw(mkpath);
+use File::Basename qw(dirname);
 use File::Spec;
 use Kagura ();
 use Plack::Util;
-use ExtUtils::MakeMaker qw/prompt/;
+use IO::Prompt::Simple qw(prompt);
 
 my $renderer = 'Text::MictoTemplate::File';
 my $suffix_map = +{
@@ -22,6 +22,7 @@ GetOptions(
     'r|renderer=s'        => \$renderer,
     's|template-suffix=s' => \my $suffix,
     'p|plugin=s@'         => \my @plugins,
+    'o|overwrite!'        => \my $overwrite,
 ) or usage();
 
 my $name = shift || usage();
@@ -29,11 +30,8 @@ my $name = shift || usage();
 (my $base_path = $name) =~ s{::}{/}g;
 
 main: {
-    die "$base_dir is exists!\n" if -e $base_dir;
-
     check_has_plugins();
     write_all();
-
     exit;
 }
 
@@ -49,7 +47,7 @@ sub check_has_plugins {
 }
 
 sub write_all {
-    mkdir $base_dir or die "$base_dir: $!";
+    mkdir $base_dir or die "$base_dir: $!" unless -e $base_dir;
     chdir $base_dir or die "$base_dir: $!";
 
     my $data = _parse_data_section();
@@ -66,7 +64,9 @@ sub write_all {
 #        if ($path =~ /\.(?:ico|jpe?g|png|gif)$/) {
 #            $content = MIME::Base64::Perl::decode_base64($content);
 #        }
+        next if -f $path && !prompt "$path is exists!! Are you sure to overwrite?" => { yn => 1 };
         open my $out, '>', $path or die "Cannot open '$path' for writing: $!";
+        chomp $content;
         print $out $content;
         close $out;
     }
