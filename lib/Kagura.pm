@@ -156,6 +156,13 @@ sub render {
     ], [$content]);
 }
 
+sub redirect {
+    my $self = shift;
+    my $res = $self->response_class->new;
+    $res->redirect(@_);
+    return $res;
+}
+
 sub return_404 {
     return $_[0]->response_class->new(404, [], ['404 Not Found']);
 }
