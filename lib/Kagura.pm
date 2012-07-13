@@ -8,7 +8,7 @@ use Tiffany;
 use Encode ();
 use Router::Simple::Sinatraish ();
 use Class::Data::Inheritable;
-use Path::Class qw/file dir/;
+use Path::Class qw(file dir);
 use Class::Accessor::Lite (
     new => 1,
     ro  => [qw/req params/],
