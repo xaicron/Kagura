@@ -68,7 +68,7 @@ sub init {
     $class->init_finalize();
 }
 
-# you can override this method
+# you can override this methods
 sub init_prepare  {}
 sub init_finalize {}
 
@@ -204,6 +204,7 @@ sub to_app {
     sub {
         my $env = shift;
         my $res;
+        my $req = $pkg->request_class->new($env);
         my ($match, $route) = $class->router->routematch($env);
         if ($match && $route) {
             delete $match->{code} if ref $match->{code} eq 'CODE';
@@ -219,16 +220,22 @@ sub to_app {
             local *{"$pkg\::context"} = sub { $c };
             use strict 'refs';
 
+            $c->before_dispatch($req);
             $res = $route->{dest}{code}->($c, $req);
             $res = $c->show_error() unless ref $res;
+            $c->after_dispatch($res);
         }
         else {
             $res = $pkg->return_404();
         }
 
-        $res->finalize;
+        return $res->finalize;
     };
 }
+
+# you can override this methods
+sub before_dispatch {}
+sub after_dispatch  {}
 
 1;
 __END__
