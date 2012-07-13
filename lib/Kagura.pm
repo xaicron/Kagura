@@ -49,23 +49,23 @@ sub bootstrap {
 sub init {
     my ($class) = @_;
 
-    $class->init_prepare();
-
     $class->mk_classdata('config');
     $class->mk_classdata('home_dir');
     $class->mk_classdata('renderer');
-    $class->mk_classdata('container', load_container($class));
+    $class->mk_classdata('container', $class->load_container);
     $class->mk_classdata('response_class', 'Plack::Response');
     $class->mk_classdata('request_class', 'Plack::Request');
     $class->mk_classdata('_loaded_plugin', +{});
 
-    $class->init_home_dir();
-    $class->init_config();
-    $class->init_renderer();
-    $class->init_container();
-    $class->init_plugins();
+    $class->init_prepare;
 
-    $class->init_finalize();
+    $class->init_home_dir;
+    $class->init_config;
+    $class->init_renderer;
+    $class->init_container;
+    $class->init_plugins;
+
+    $class->init_finalize;
 }
 
 # you can override this methods
